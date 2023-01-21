@@ -22,8 +22,25 @@ function Invoke-TextCompletion {
                         "Content-Type" = "application/json"
                     }
     }
-    $border = [string]::new('-', [System.Console]::WindowWidth)
-    Write-Host "`n$border$((Invoke-RestMethod @restMethodParams).choices.text)`n`n$border`n" -ForegroundColor Green
+    $border = "`n$([string]::new('-', [System.Console]::WindowWidth))"
+    $response = "$((Invoke-RestMethod @restMethodParams).choices.text)`n"
+    Write-Host "$border$response$border`n" -ForegroundColor Green
+
+    $saveData = [PSCustomObject]@{
+        Prompt = $Prompt
+        Answer = $response
+        CreatedDate = Get-Date
+    }
+
+    $sql_params = @{
+        ServerInstance  = 'WKSP000D71A6\SQL'
+        TableName       = 'QuestionAnswer'
+        DatabaseName    = 'ChatGPT'
+        SchemaName      = 'dbo'
+        Force           = $true
+    }
+
+    $saveData | Write-SqlTableData @sql_params
 }
 
 Set-Alias -Name 'ask' -Value 'Invoke-TextCompletion'
