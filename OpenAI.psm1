@@ -21,11 +21,8 @@ function Invoke-TextCompletion {
                         "Content-Type" = "application/json"
                     }
     }
-    
-    $response = (Invoke-RestMethod @restMethodParams).choices.text
-    1..[System.Console]::WindowWidth | % { Write-Host '-' -NoNewline -ForegroundColor Green } 
-    Write-Host "$response`n" -ForegroundColor Green
-    1..[System.Console]::WindowWidth | % { Write-Host '-' -NoNewline -ForegroundColor Green } 
+    $border = [string]::new('-', [System.Console]::WindowWidth)
+    Write-Host "`n$border$((Invoke-RestMethod @restMethodParams).choices.text)`n`n$border`n" -ForegroundColor Green
 }
 
 Set-Alias -Name 'ask' -Value 'Invoke-TextCompletion'
