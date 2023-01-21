@@ -26,23 +26,25 @@ function Invoke-TextCompletion {
     $response = "$((Invoke-RestMethod @restMethodParams).choices.text)`n"
     Write-Host "$border$response$border`n" -ForegroundColor Green
 
-    $saveData = [PSCustomObject]@{
-        Prompt = $Prompt
-        Answer = $response
-        CreatedDate = Get-Date
-    }
-
+    
     $sql_params = @{
-        ServerInstance  = 'WKSP000D71A6\SQL'
-        TableName       = 'QuestionAnswer'
-        DatabaseName    = 'ChatGPT'
-        SchemaName      = 'dbo'
-        Force           = $true
+        ServerInstance = 'DESKTOP-N637ORC'
+        TableName      = 'chat_interaction'
+        DatabaseName   = 'ChatGPT'
+        SchemaName     = 'dbo'
+        Force          = $true
     }
-
+    
+    $saveData = [PSCustomObject]@{
+        id          = $null
+        request     = [string]$Prompt
+        response    = [string]$response
+        create_date = (Get-Date).DateTime
+    }
+    
     $saveData | Write-SqlTableData @sql_params
 }
 
 Set-Alias -Name 'ask' -Value 'Invoke-TextCompletion'
-Export-ModuleMember -Function 'Invoke-TextCompletion', 'PrintWithBorder' -Alias 'ask'
+Export-ModuleMember -Function 'Invoke-TextCompletion' -Alias 'ask'
 
